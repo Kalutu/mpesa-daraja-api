@@ -6,8 +6,8 @@ from django_daraja.mpesa.core import MpesaClient
 def index(request):
     cl = MpesaClient()
     # Use a Safaricom phone number that you have access to, for you to be able to view the prompt.
-    phone_number = '0713118765'
-    amount = 1
+    phone_number = '0712345678'# NUMBER HERE
+    amount = 1 # AMOUNT HERE
     account_reference = 'reference'
     transaction_desc = 'Description'
     callback_url = 'https://darajambili.herokuapp.com/express-payment';
