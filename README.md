@@ -20,7 +20,7 @@ To configure the Mpesa Daraja API integration, follow these steps:
 
 1. **Set your Mpesa API credentials**: In your Django project's settings, provide the necessary Mpesa API credentials, including the Consumer Key, Consumer Secret, and Lipa Na Mpesa Online Passkey.
 
-2. **Customize views and templates**: Tailor the views and templates to match your specific use case. This customization can include creating dedicated views and templates for payment processing, transaction status checks, and handling webhook notifications.
+2. **Customize views and templates**: Tailor the views and templates to match your specific use case. This customization can include creating dedicated views and templates for payment processing, transaction status checks, and handling webhook notifications. You should also edit the phone number and amount.
 
 3. **Error handling and security**: Implement error handling, logging, and security measures that align with your project requirements. Ensure that your application effectively manages errors and exceptions during payment processing and webhook handling.
 
