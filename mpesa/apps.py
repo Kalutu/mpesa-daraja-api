@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class DarajaConfig(AppConfig):
+class MpesaConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'daraja'
+    name = 'mpesa'
