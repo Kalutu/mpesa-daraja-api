@@ -34,22 +34,22 @@ The **sandbox environment** allows you to develop and test your integration befo
    - Once logged in, go to the **"My Apps"** tab and click **"Create New App."**
    - Tick all checkboxes to avoid missing any required permissions.
 
-   ![New App Creation](#) <!-- Placeholder for image -->
+   ![New App Creation](screenshots/00.png)
 
 3. **Retrieve Your Sandbox Credentials:**
 
    - After creating your app, it will appear under **"Sandbox Apps."**
    - Copy the **Consumer Key** and **Consumer Secret** from there.
 
-   ![Sandbox App Credentials](#) <!-- Placeholder for image -->
+   ![Sandbox App Credentials](screenshots/01.png)
 
 4. **Simulate API Requests:**
 
    - Click the **"APIs"** tab, select your app from the dropdown, and retrieve credentials for testing.
 
-   ![API Simulation Page](#) <!-- Placeholder for image -->
+   ![API Page](screenshots/02.png)
 
----
+   ![API Simulation Page](screenshots/03.png)
 
 ## **Getting Live Credentials**
 
@@ -57,6 +57,8 @@ Once you’re ready to go live, follow these steps to obtain the production cred
 
 1. **Go Live Tab:**  
    Head over to the **"Go Live"** tab on the Daraja portal and follow the prompts. No need to create an app for production.
+
+   ![Go Live Page](screenshots/04.png)
 
 2. **PassKey via Email:**  
    Your **PassKey** will be sent directly to your email after your Paybill or Till is successfully activated.
