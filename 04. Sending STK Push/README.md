@@ -1,4 +1,4 @@
-# M-PESA DARAJA Payment APIs Walkthrough
+# Code Walkthrough
 
 At this point, we should have the following details:
 
