@@ -47,12 +47,13 @@ The token generated will be passed as **Authorization Headers** in all subsequen
 To generate the token, follow these steps:
 
 1. Create a Base-64 encoding of `Consumer Key + ":" + Consumer Secret`.
-2. Send a GET request to the appropriate endpoint based on the environment:
+
+2. Set the `Authorization` header to `Basic [encoded_credentials]`.
+
+3. Send a GET request to the appropriate endpoint based on the environment:
 
    - **Sandbox:** `https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials`
    - **Live:** `https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials`
-
-3. Set the `Authorization` header to `Basic [encoded_credentials]`.
 
 ### Node.js Sample Code
 
