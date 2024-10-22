@@ -53,15 +53,15 @@ The **sandbox environment** allows you to develop and test your integration befo
 
 ## **Getting Live Credentials**
 
-Once you’re ready to go live, follow these steps to obtain the production credentials:
+When you're ready to transition to production, follow these steps to obtain your live credentials:
 
-1. **Go Live Tab:**  
-   Head over to the **"Go Live"** tab on the Daraja portal and follow the prompts. No need to create an app for production.
+1. **Access the Go Live Tab:**  
+   Navigate to the **"Go Live"** tab on the Daraja portal and follow the prompts. You don’t need to create a new app for production. Once the setup is complete, your app will appear under the **"Live"** section within **My Apps**. From there, copy the **Consumer Key** and **Consumer Secret**.
 
    ![Go Live Page](screenshots/04.png)
 
-2. **PassKey via Email:**  
-   Your **PassKey** will be sent directly to your email after your Paybill or Till is successfully activated.
+2. **Receiving the PassKey:**  
+   After your Paybill or Till is activated, Safaricom will send the **PassKey** to your registered email. Keep an eye on your inbox for this crucial credential, as it’s required for live API requests.
 
 ---
 
@@ -74,9 +74,3 @@ You now have the three essential credentials:
 - **PassKey**
 
 Once these are ready, you’re all set to integrate M-Pesa with your system and start accepting payments.
-
----
-
-With these credentials, your M-Pesa integration journey is complete! Now, you're ready to **authenticate API requests and receive payments securely.**
-
-**Happy coding and successful transactions! 🚀**
