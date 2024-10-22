@@ -11,6 +11,28 @@ Safaricom M-PESA DARAJA provides several payment APIs. In this session, we focus
 - **Authorization API**
 - **M-Pesa Express**
 
+The Lipa na M-PESA online API process is explained below;
+
+1.  The Merchant(Partner) captures and sets the API required parameters and sends the API request.
+
+2.  The API receives the request and validates it internally first, then sends you an acknowledgment response.
+
+3.  Through API Proxy an STK Push trigger request is sent to the M-PESA registered phone number of the customer's making the payment.
+
+4.  The customer confirms by entering their M-PESA PIN.
+
+5.  The response is sent back to M-PESA and is processed as below:
+
+    a) M-PESA validates the customer's PIN
+
+    b) M-PESA debits the customer's Mobile Wallet.
+
+    c) M-PESA credits the Merchant (Partner) account.
+
+6.  Once the request is processed send the RESULTS back to the API Management system which is then forwarded to the merchant via the callback URL specified in the REQUEST.
+
+7.  The customer receives an SMS confirmation message of the payment.
+
 ---
 
 ## Authorization API
