@@ -115,6 +115,7 @@ This API checks the status of an STK Push request initiated earlier using Lipa n
    #### API Endpoint:
 
    Sandbox: https://sandbox.safaricom.co.ke/mpesa/stkpushquery/v1/query
+
    Live: https://api.safaricom.co.ke/mpesa/stkpushquery/v1/query
 
    #### Node.js
