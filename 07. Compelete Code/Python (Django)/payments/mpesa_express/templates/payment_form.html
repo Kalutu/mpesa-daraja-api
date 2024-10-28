@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Make Payment</title>
+
+    <!-- Bootstrap CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css"
+    />
+  </head>
+  <body
+    class="d-flex align-items-center justify-content-center vh-100 bg-light"
+  >
+    {% load bootstrap5 %}
+    <div class="card shadow-sm p-4" style="width: 100%; max-width: 500px">
+      <h3 class="text-center mb-4">Make Payment</h3>
+
+      <!-- Display Error Message -->
+      {% if error_message %}
+      <div class="alert alert-danger" role="alert">{{ error_message }}</div>
+      {% endif %}
+
+      <!-- Display Success Message -->
+      {% if success_message %}
+      <div class="alert alert-success" role="alert">{{ success_message }}</div>
+      {% endif %}
+
+      <form method="POST" class="needs-validation" novalidate>
+        {% csrf_token %} {% for field in form %}
+        <div class="mb-3">{% bootstrap_field field %}</div>
+        {% endfor %}
+        <button type="submit" class="btn btn-success w-100">Pay</button>
+      </form>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
