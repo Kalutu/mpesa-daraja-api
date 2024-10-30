@@ -10,6 +10,15 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
+# Retrieve variables from the environment
+CONSUMER_KEY = os.getenv("CONSUMER_KEY")
+CONSUMER_SECRET = os.getenv("CONSUMER_SECRET")
+MPESA_PASSKEY = os.getenv("MPESA_PASSKEY")
+
+MPESA_SHORTCODE = os.getenv("MPESA_SHORTCODE")
+CALLBACK_URL = os.getenv("CALLBACK_URL")
+MPESA_BASE_URL = os.getenv("MPESA_BASE_URL")
+
 # Phone number formatting and validation
 def format_phone_number(phone):
     phone = phone.replace("+", "")
@@ -23,9 +32,7 @@ def format_phone_number(phone):
 # Generate M-Pesa access token
 def generate_access_token():
     try:
-        consumer_key = os.getenv("CONSUMER_KEY")
-        consumer_secret = os.getenv("CONSUMER_SECRET")
-        credentials = f"{consumer_key}:{consumer_secret}"
+        credentials = f"{CONSUMER_KEY}:{CONSUMER_SECRET}"
         encoded_credentials = base64.b64encode(credentials.encode()).decode()
 
         headers = {
@@ -33,7 +40,7 @@ def generate_access_token():
             "Content-Type": "application/json",
         }
         response = requests.get(
-            "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials",
+            f"{MPESA_BASE_URL}/oauth/v1/generate?grant_type=client_credentials",
             headers=headers,
         ).json()
 
@@ -53,25 +60,25 @@ def initiate_stk_push(phone, amount):
 
         timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
         stk_password = base64.b64encode(
-            (os.getenv("MPESA_SHORTCODE") + os.getenv("MPESA_PASSKEY") + timestamp).encode()
+            (MPESA_SHORTCODE + MPESA_PASSKEY + timestamp).encode()
         ).decode()
 
         request_body = {
-            "BusinessShortCode": os.getenv("MPESA_SHORTCODE"),
+            "BusinessShortCode": MPESA_SHORTCODE,
             "Password": stk_password,
             "Timestamp": timestamp,
             "TransactionType": "CustomerPayBillOnline",
             "Amount": amount,
             "PartyA": phone,
-            "PartyB": os.getenv("MPESA_SHORTCODE"),
+            "PartyB": MPESA_SHORTCODE,
             "PhoneNumber": phone,
-            "CallBackURL": os.getenv("CALLBACK_URL"),
+            "CallBackURL": CALLBACK_URL,
             "AccountReference": "account",
             "TransactionDesc": "Payment for goods",
         }
 
         response = requests.post(
-            "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest",
+            f"{MPESA_BASE_URL}/mpesa/stkpush/v1/processrequest",
             json=request_body,
             headers=headers,
         ).json()
@@ -119,18 +126,18 @@ def query_stk_push(checkout_request_id):
 
         timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
         password = base64.b64encode(
-            (os.getenv("MPESA_SHORTCODE") + os.getenv("MPESA_PASSKEY") + timestamp).encode()
+            (MPESA_SHORTCODE + MPESA_PASSKEY + timestamp).encode()
         ).decode()
 
         request_body = {
-            "BusinessShortCode": os.getenv("MPESA_SHORTCODE"),
+            "BusinessShortCode": MPESA_SHORTCODE,
             "Password": password,
             "Timestamp": timestamp,
             "CheckoutRequestID": checkout_request_id
         }
 
         response = requests.post(
-            "https://sandbox.safaricom.co.ke/mpesa/stkpushquery/v1/query",
+            f"{MPESA_BASE_URL}/mpesa/stkpushquery/v1/query",
             json=request_body,
             headers=headers,
         )
