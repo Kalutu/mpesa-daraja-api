@@ -17,7 +17,6 @@
     {% load bootstrap5 %}
     <div class="card shadow-sm p-4" style="width: 100%; max-width: 500px">
       <h3 class="text-center mb-4">Confirm Your Payment</h3>
-      <!-- Status Section -->
       <div class="text-center mt-3" id="status-container">
         <h5
           class="alert alert-info d-flex align-items-center justify-content-center"
@@ -36,8 +35,6 @@
         </div>
         <p class="mt-2" id="status-message">Waiting for confirmation...</p>
       </div>
-
-      <!-- Retry Button (Hidden Initially) -->
       <div class="d-flex justify-content-center mt-4">
         <a
           href="{% url 'payment' %}"
@@ -52,19 +49,27 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <!-- Canvas Confetti JS -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 
-    <!-- Custom JavaScript to Poll STK Push Status -->
     <script>
-      let reqcount = 0; // Initialize request counter
-      const maxAttempts = 15; // Limit to 15 attempts (30 seconds total)
-      const checkoutRequestID = "{{ checkout_request_id }}"; // Passed from backend
+      let reqcount = 0;
+      const maxAttempts = 15;
+      const checkoutRequestID = "{{ checkout_request_id }}";
       const statusContainer = document.getElementById("status-container");
       const loadingSpinner = document.getElementById("loading-spinner");
       const statusMessage = document.getElementById("status-message");
       const retryButton = document.getElementById("retry-button");
       const initialMessage = document.getElementById("initial-message");
 
-      // Function to handle STK status polling
+      const confettiEffect = () => {
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 },
+        });
+      };
+
       const stkPushQueryWithIntervals = (checkoutRequestID) => {
         const timer = setInterval(async () => {
           reqcount += 1;
@@ -74,7 +79,7 @@
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
-                "X-CSRFToken": "{{ csrf_token }}", // Ensure CSRF token is included
+                "X-CSRFToken": "{{ csrf_token }}",
               },
               body: JSON.stringify({ checkout_request_id: checkoutRequestID }),
             });
@@ -84,7 +89,6 @@
             const data = await response.json();
             console.log("STK Query Response:", data);
 
-            // Handle specific cases based on status
             const resultCode = data.status.ResultCode;
             const resultDesc =
               data.status.ResultDesc || "Payment failed. Please try again.";
@@ -92,7 +96,6 @@
             if (data.status.errorCode === "500.001.1001") {
               console.log("Payment is still being processed...");
             } else if (resultCode === "0") {
-              // Payment successful, stop polling
               clearInterval(timer);
               loadingSpinner.style.display = "none";
               initialMessage.innerHTML = `Payment success`;
@@ -104,8 +107,8 @@
                   <p class="mt-2">Payment completed successfully. Thank you!</p>
                 </div>
               `;
+              confettiEffect(); // Trigger confetti on success
             } else if (resultCode) {
-              // Payment failed, stop polling and show retry button
               clearInterval(timer);
               loadingSpinner.style.display = "none";
               initialMessage.innerHTML = `Payment failed`;
@@ -117,7 +120,7 @@
                   <p class="mt-2">${resultDesc}</p>
                 </div>
               `;
-              retryButton.style.display = "inline-block"; // Show retry button
+              retryButton.style.display = "inline-block";
             }
           } catch (error) {
             console.error("Error:", error);
@@ -131,16 +134,15 @@
                 You took too long to confirm the payment. Please try again.
               </div>
             `;
-            retryButton.style.display = "inline-block"; // Show retry button
+            retryButton.style.display = "inline-block";
           }
-        }, 2000); // Poll every 2 seconds
+        }, 2000);
       };
 
-      // Retry button click handler
       retryButton.addEventListener("click", () => {
-        reqcount = 0; // Reset request counter
-        retryButton.style.display = "none"; // Hide retry button
-        loadingSpinner.style.display = "inline-block"; // Show loading spinner
+        reqcount = 0;
+        retryButton.style.display = "none";
+        loadingSpinner.style.display = "inline-block";
         statusMessage.textContent = "Waiting for confirmation...";
         stkPushQueryWithIntervals(checkoutRequestID);
       });
