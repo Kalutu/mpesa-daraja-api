@@ -28,15 +28,49 @@
       <div class="alert alert-success" role="alert">{{ success_message }}</div>
       {% endif %}
 
-      <form method="POST" class="needs-validation" novalidate>
+      <form
+        method="POST"
+        class="needs-validation"
+        novalidate
+        onsubmit="handleFormSubmit(event)"
+      >
         {% csrf_token %} {% for field in form %}
         <div class="mb-3">{% bootstrap_field field %}</div>
         {% endfor %}
-        <button type="submit" class="btn btn-success w-100">Pay</button>
+        <button
+          type="submit"
+          class="btn btn-success w-100 rounded-pill"
+          id="submitButton"
+        >
+          <span
+            id="spinner"
+            class="spinner-border spinner-border-sm"
+            role="status"
+            aria-hidden="true"
+            style="display: none"
+          ></span>
+          <span id="buttonText">Pay</span>
+        </button>
       </form>
     </div>
 
     <!-- Bootstrap JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+      function handleFormSubmit(event) {
+        event.preventDefault();
+
+        const submitButton = document.getElementById("submitButton");
+        const buttonText = document.getElementById("buttonText");
+        const spinner = document.getElementById("spinner");
+
+        buttonText.textContent = "Processing...";
+        spinner.style.display = "inline-block";
+        submitButton.disabled = true;
+
+        // Submit the form
+        event.target.submit();
+      }
+    </script>
   </body>
 </html>

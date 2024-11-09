@@ -10,13 +10,23 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css"
     />
+    <!-- Font Awesome Link -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+      rel="stylesheet"
+    />
   </head>
   <body
     class="d-flex align-items-center justify-content-center vh-100 bg-light"
   >
     {% load bootstrap5 %}
-    <div class="card shadow-sm p-4" style="width: 100%; max-width: 500px">
-      <h3 class="text-center mb-4">Confirm Your Payment</h3>
+    <div class="card shadow-sm p-5" style="max-width: 600px; width: 100%">
+      {% if error_message %}
+      <div class="alert alert-danger text-center" role="alert">
+        {{ error_message }}
+      </div>
+      {% endif %}
+      <h3 class="text-center mb-4" id="confirm-text">Confirm Your Payment</h3>
       <div class="text-center mt-3" id="status-container">
         <h5
           class="alert alert-info d-flex align-items-center justify-content-center"
@@ -37,10 +47,11 @@
       </div>
       <div class="d-flex justify-content-center mt-4">
         <a
-          href="{% url 'payment' %}"
+          href="javascript:void(0);"
           class="btn btn-warning"
           id="retry-button"
           style="display: none"
+          onclick="location.reload();"
         >
           Retry Payment
         </a>
@@ -54,13 +65,14 @@
 
     <script>
       let reqcount = 0;
-      const maxAttempts = 15;
+      const maxAttempts = 60;
       const checkoutRequestID = "{{ checkout_request_id }}";
       const statusContainer = document.getElementById("status-container");
       const loadingSpinner = document.getElementById("loading-spinner");
       const statusMessage = document.getElementById("status-message");
       const retryButton = document.getElementById("retry-button");
       const initialMessage = document.getElementById("initial-message");
+      const confirmText = document.getElementById("confirm-text");
 
       const confettiEffect = () => {
         confetti({
@@ -98,28 +110,30 @@
             } else if (resultCode === "0") {
               clearInterval(timer);
               loadingSpinner.style.display = "none";
-              initialMessage.innerHTML = `Payment success`;
+              confirmText.style.display = "none";
+              initialMessage.innerHTML = `Payment successful <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="#006039" class="bi bi-check-circle m-2" viewBox="0 0 16 16">
+                        <path d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm3.97-8.03a.75.75 0 0 1 0 1.06l-4 4a.75.75 0 0 1-1.06 0l-2-2a.75.75 0 0 1 1.06-1.06L7.5 10.94l3.47-3.47a.75.75 0 0 1 1.06 0z"/>
+                      </svg>`;
               statusMessage.innerHTML = `
-                <div class="text-success">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-check-circle" viewBox="0 0 16 16">
-                    <path d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm3.97-8.03a.75.75 0 0 1 0 1.06l-4 4a.75.75 0 0 1-1.06 0l-2-2a.75.75 0 0 1 1.06-1.06L7.5 10.94l3.47-3.47a.75.75 0 0 1 1.06 0z"/>
-                  </svg>
-                  <p class="mt-2">Payment completed successfully. Thank you!</p>
-                </div>
-              `;
+                    <div class="text-success">
+                     <p class="mt-2">Thank you for completing your payment!</p>
+                      <a href="{% url 'payment' %}" class="btn btn-success">Ok</a>
+                    </div>
+                  `;
               confettiEffect(); // Trigger confetti on success
             } else if (resultCode) {
               clearInterval(timer);
               loadingSpinner.style.display = "none";
-              initialMessage.innerHTML = `Payment failed`;
+              confirmText.style.display = "none";
+              initialMessage.innerHTML = `Payment failed <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-x-circle-fill text-danger m-2" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293z"/></svg>`;
               statusMessage.innerHTML = `
-                <div class="text-danger">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-exclamation-triangle" viewBox="0 0 16 16">
-                    <path d="M7.938 2.016a.13.13 0 0 1 .125 0l6.857 11.856c.06.104.008.237-.104.237H1.104a.13.13 0 0 1-.104-.237L7.856 2.016zM8 5c-.535 0-.954.462-.9.995l.4 4c.07.593.637.995 1.1.995s1.03-.402 1.1-.995l.4-4c.054-.533-.365-.995-.9-.995zM8 12a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
-                  </svg>
-                  <p class="mt-2">${resultDesc}</p>
-                </div>
-              `;
+                    <div class="text-danger">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-exclamation-triangle" viewBox="0 0 16 16">
+                        <path d="M7.938 2.016a.13.13 0 0 1 .125 0l6.857 11.856c.06.104.008.237-.104.237H1.104a.13.13 0 0 1-.104-.237L7.856 2.016zM8 5c-.535 0-.954.462-.9.995l.4 4c.07.593.637.995 1.1.995s1.03-.402 1.1-.995l.4-4c.054-.533-.365-.995-.9-.995zM8 12a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
+                      </svg>
+                      <p class="mt-2">${resultDesc}</p>
+                    </div>
+                  `;
               retryButton.style.display = "inline-block";
             }
           } catch (error) {
@@ -130,10 +144,10 @@
             clearInterval(timer);
             loadingSpinner.style.display = "none";
             statusMessage.innerHTML = `
-              <div class="alert alert-warning" role="alert">
-                You took too long to confirm the payment. Please try again.
-              </div>
-            `;
+                  <div class="alert alert-warning" role="alert">
+                    You took too long to confirm the payment. Please try again.
+                  </div>
+                `;
             retryButton.style.display = "inline-block";
           }
         }, 2000);
