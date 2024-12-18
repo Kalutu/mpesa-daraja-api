@@ -132,24 +132,18 @@ const handleCallback = async (req, res) => {
 // 3. STK Query (Check payment status)
 const stkQuery = async (req, res) => {
   try {
-    // Get the CheckoutRequestID from the request body
     const { checkoutRequestId } = req.body;
     if (!checkoutRequestId) {
       return res.status(400).json({ error: "CheckoutRequestID is required" });
     }
 
-    // Generate the Timestamp (YYYYMMDDHHMMSS format)
-    const timestamp = new Date()
-      .toISOString()
-      .replace(/[-T:\.Z]/g, "")
-      .slice(0, 14);
+    // Generate timestamp in format YYYYMMDDHHMMSS
+    const timestamp = moment().format("YYYYMMDDHHmmss");
 
-    // Generate the STK Password
     const password = Buffer.from(
       `${process.env.SHORTCODE}${process.env.PASSKEY}${timestamp}`
     ).toString("base64");
 
-    // Prepare the Request Body
     const requestBody = {
       BusinessShortCode: process.env.SHORTCODE,
       Password: password,
@@ -157,37 +151,79 @@ const stkQuery = async (req, res) => {
       CheckoutRequestID: checkoutRequestId,
     };
 
-    // Send the STK Query request to Safaricom API
-    const response = await axios.post(
-      `${process.env.BASE_URL}/mpesa/stkpushquery/v1/query`,
-      requestBody,
-      {
-        headers: {
-          Authorization: `Bearer ${req.darajaToken}`,
-        },
-      }
-    );
+    const pollForStatus = async (
+      attempt = 0,
+      maxAttempts = 12,
+      delay = 5000
+    ) => {
+      try {
+        const response = await axios.post(
+          `${process.env.BASE_URL}/mpesa/stkpushquery/v1/query`,
+          requestBody,
+          {
+            headers: {
+              Authorization: `Bearer ${req.darajaToken}`,
+            },
+          }
+        );
 
-    // Check the response from Safaricom API
-    const { ResultCode, ResultDesc } = response.data;
-    if (ResultCode === 0) {
-      return res.status(200).json({
-        message: "Query successful",
-        status: "Success",
-        result: response.data,
-      });
-    } else {
-      return res.status(400).json({
-        message: "Query failed",
-        status: "Failure",
-        resultCode: ResultCode,
-        resultDesc: ResultDesc,
-      });
-    }
+        const { ResultCode, ResultDesc } = response.data;
+
+        if (ResultCode !== undefined) {
+          if (ResultCode === "0") {
+            // Success response
+            return {
+              status: "Success",
+              message: "Payment successful",
+              data: response.data,
+            };
+          } else {
+            // Failure response (ResultCode !== 0)
+            return {
+              status: "Failure",
+              message: ResultDesc,
+              data: response.data,
+            };
+          }
+        }
+
+        // Still processing, retry if attempts are left
+        if (attempt < maxAttempts) {
+          console.log(
+            `Transaction still processing. Retrying... Attempt ${
+              attempt + 1
+            }/${maxAttempts}`
+          );
+          await new Promise((resolve) => setTimeout(resolve, delay));
+          return pollForStatus(attempt + 1);
+        }
+
+        // If retries exhausted
+        return {
+          status: "Timeout",
+          message: "You took too long to pay. Please try again.",
+        };
+      } catch (error) {
+        if (attempt < maxAttempts) {
+          console.log("Payment is still processing");
+          await new Promise((resolve) => setTimeout(resolve, delay));
+          return pollForStatus(attempt + 1);
+        }
+
+        // If retries are exhausted, throw final error
+        throw error;
+      }
+    };
+
+    // Wait for the polling to finish and respond accordingly
+    const result = await pollForStatus();
+
+    return res.status(result.status === "Timeout" ? 408 : 200).json(result);
   } catch (error) {
     console.error("Error querying STK payment:", error.message);
     return res.status(500).json({
       error: "An error occurred while querying the STK payment status.",
+      details: error.response?.data || error.message,
     });
   }
 };
