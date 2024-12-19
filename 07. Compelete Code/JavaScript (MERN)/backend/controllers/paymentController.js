@@ -132,8 +132,8 @@ const handleCallback = async (req, res) => {
 // 3. STK Query (Check payment status)
 const stkQuery = async (req, res) => {
   try {
-    const { checkoutRequestId } = req.body;
-    if (!checkoutRequestId) {
+    const { checkoutRequestID } = req.body;
+    if (!checkoutRequestID) {
       return res.status(400).json({ error: "CheckoutRequestID is required" });
     }
 
@@ -148,7 +148,7 @@ const stkQuery = async (req, res) => {
       BusinessShortCode: process.env.SHORTCODE,
       Password: password,
       Timestamp: timestamp,
-      CheckoutRequestID: checkoutRequestId,
+      CheckoutRequestID: checkoutRequestID,
     };
 
     const pollForStatus = async (
